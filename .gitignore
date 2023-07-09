@@ -1,0 +1,10 @@
+__pycache__/**
+bin/**
+include/**
+lib/**
+lib64
+model_output/**
+share/**
+unlabeled2017/**
+unlabeled2017.zip
+pyvenv.cfg
