@@ -13,4 +13,4 @@ COPY unet.py .
 COPY network.py .
 COPY measure.py .
 COPY train.py .
-CMD ["python", "train.py"]
+ENTRYPOINT ["python", "train.py"]

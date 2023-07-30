@@ -1,6 +1,12 @@
 docker run --rm --mount type=bind,source="$(pwd)"/model_output,target=/workspace/output \
  --mount type=bind,source="$(pwd)"/unlabeled2017,target=/workspace/unlabeled2017 \
+ --mount type=bind,source="$(pwd)"/results.txt,target=/workspace/results.txt \
  --gpus all \
  -p 8000:8000\
  --ipc=host \
+ --pid=host \
+ -v /etc/localtime:/etc/localtime \
+ -e NUM=$1 \
+ -e SMALL=$2 \
+ -e EPOCH=$3 \
  -it network

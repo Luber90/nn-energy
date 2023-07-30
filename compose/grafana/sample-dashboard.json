@@ -398,6 +398,7 @@
         "y": 9
       },
       "id": 25,
+      "interval": "10s",
       "options": {
         "legend": {
           "calcs": [],
@@ -492,7 +493,7 @@
         "y": 17
       },
       "id": 23,
-      "maxDataPoints": 4000,
+      "interval": "10s",
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -515,7 +516,7 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)*0.00417",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)*0.00278",
           "instant": false,
           "legendFormat": "CPU Net Power used",
           "range": true,
@@ -527,12 +528,9 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "gpu_usage*0.00417",
-          "format": "time_series",
+          "expr": "gpu_usage*0.00278",
           "hide": false,
           "instant": false,
-          "interval": "",
           "legendFormat": "GPU Power used",
           "range": true,
           "refId": "B"
@@ -540,74 +538,6 @@
       ],
       "title": "Power usage",
       "transformations": [],
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBE40D95A8B8C9AF4"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "decmbytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 10,
-        "x": 8,
-        "y": 17
-      },
-      "id": 27,
-      "maxDataPoints": 3000,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
-      },
-      "pluginVersion": "10.0.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBE40D95A8B8C9AF4"
-          },
-          "editorMode": "code",
-          "expr": "network_gpu_memory_usage_mb",
-          "instant": false,
-          "legendFormat": "GPU Memory usage",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Memory usage",
       "type": "stat"
     },
     {
@@ -1143,8 +1073,8 @@
     ]
   },
   "time": {
-    "from": "2023-07-07T13:21:07.000Z",
-    "to": "now"
+    "from": "2023-07-20T15:10:32.000Z",
+    "to": "2023-07-20T15:29:48.000Z"
   },
   "timepicker": {
     "refresh_intervals": [

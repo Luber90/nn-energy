@@ -16,27 +16,13 @@ import socket
 from datetime import datetime
 
 
-def send_pid_to_measure(PID):
-    IP = '127.0.0.1'
-    PORT = 5005
-    MESSAGE = f'{PID}'
-    MESSAGE = MESSAGE.encode()
-    #sending the pid to measuring app
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
-            s.connect((IP, PORT))
-            s.sendall(MESSAGE)
-        except ConnectionRefusedError:
-            print("Could not connect to measure process. Continuing.")
-
-
 def run(argv):
 
-    PID = os.getpid()
+    num_of_images = argv[0]
+    smaller = argv[1]
+    epochs = argv[2]
 
     paths = glob.glob("unlabeled2017/*.jpg")
-
-    num_of_images = 90_000#int(argv[1])
 
     np.random.seed(42)
     paths_subset = np.random.choice(paths, num_of_images, replace=False)
@@ -100,9 +86,7 @@ def run(argv):
 
     device = torch.device("cuda:0")
 
-    #print(argv[2] == "True")
-    model = UNet(smaller=False)
-    #model = UNet(smaller=argv[2] == "True")
+    model = UNet(smaller=smaller)
     model.to(device)
     optim = torch.optim.RMSprop(model.parameters(), lr=0.0001)
     #optim = torch.optim.Adam(model.parameters(), lr=0.05, weight_decay=0.0001, fused=True)
@@ -112,9 +96,7 @@ def run(argv):
 
     psnr = PeakSignalNoiseRatio().to(device)
 
-    send_pid_to_measure(PID)
-
-    for epoch in range(5):
+    for epoch in range(epochs):
 
         running_loss = 0.0
         for i, data in enumerate(dataloader_train, 0):
@@ -155,10 +137,14 @@ def run(argv):
             val_loss += loss_output.item()
             ssim.update(outputs, true_pic_gpu)
             psnr.update(outputs, true_pic_gpu)
-        print(f'[{epoch + 1}] validation loss: {val_loss / ((num_of_images-num_train)/val_batch_size):.5f} validation ssim: {ssim.compute():.5f} validation psnr: {psnr.compute():.5f}')
+        val_loss = val_loss / ((num_of_images-num_train)/val_batch_size)
+        val_ssim = ssim.compute()
+        val_psnr = psnr.compute()
+        print(f'[{epoch + 1}] validation loss: {val_loss:.5f} validation ssim: {val_ssim:.5f} validation psnr: {val_psnr:.5f}')
     end_time = str(datetime.now())[:-7]
     print(start_time)
     print(end_time)
+    return start_time, end_time, val_loss, val_ssim, val_psnr
     #torch.save(model.state_dict(), "output/model")
 
 

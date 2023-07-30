@@ -398,6 +398,7 @@
         "y": 9
       },
       "id": 25,
+      "interval": "10s",
       "options": {
         "legend": {
           "calcs": [],
@@ -492,6 +493,7 @@
         "y": 17
       },
       "id": 23,
+      "interval": "10s",
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -514,7 +516,7 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)*0.00417",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)*0.00278",
           "instant": false,
           "legendFormat": "CPU Net Power used",
           "range": true,
@@ -526,7 +528,7 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "gpu_usage*0.00417",
+          "expr": "gpu_usage*0.00278",
           "hide": false,
           "instant": false,
           "legendFormat": "GPU Power used",
@@ -1071,8 +1073,8 @@
     ]
   },
   "time": {
-    "from": "now-30m",
-    "to": "now"
+    "from": "2023-07-20T15:10:32.000Z",
+    "to": "2023-07-20T15:29:48.000Z"
   },
   "timepicker": {
     "refresh_intervals": [
