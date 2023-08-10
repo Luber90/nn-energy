@@ -7,10 +7,5 @@ output
 share
 unlabeled2017
 *.cfg
-*.txt
-!src/cpp/CMakeLists.txt
-!src/python/requirements.txt
-!results_net_size.txt
-!results_size.txt
 *.png
 src/cpp/build/

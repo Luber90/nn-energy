@@ -86,7 +86,7 @@
             "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*networkc.*\"}/ 1000000) ",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*trainc.py.*\"}/ 1000000) ",
           "interval": "",
           "legendFormat": "Network CPU Power",
           "range": true,
@@ -422,7 +422,7 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*networkc.*\"}) / 1000000",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*trainc.py.*\"}) / 1000000",
           "hide": false,
           "instant": false,
           "range": true,
@@ -456,8 +456,8 @@
             "mode": "reduceRow",
             "reduce": {
               "include": [
-                "gpu_usage{instance=\"docker.for.linux.localhost:8000\", job=\"net_measure_app\"}",
-                "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*cmag.*\"}) / 1000000"
+                "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*trainc.py.*\"}) / 1000000",
+                "gpu_usage{instance=\"docker.for.linux.localhost:8000\", job=\"net_measure_app\"}"
               ],
               "reducer": "sum"
             },
