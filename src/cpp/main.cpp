@@ -65,8 +65,7 @@ int main(){
             optimizer.step();
             running_loss += loss.item<double>();
             if (batch_index++ % 200 == 199) {
-                std::cout << "Epoch: " << epoch << " " << batch_index
-                        << " loss: " << running_loss / 200. << std::endl;
+                std::cout << "[" << epoch+1 << ",   " << batch_index << "]" << " loss: " << running_loss / 200. << std::endl;
                 running_loss = 0.0;
             }
         }
@@ -82,7 +81,7 @@ int main(){
                 val_loss += loss.item<double>();
             }
             val_loss /= (static_cast<float>(dataset_size-split)/batch_size);
-            std::cout << "Epoch: " << epoch << " val_loss: " << val_loss << std::endl;
+            std::cout << "[" << epoch+1 << "]" << " validation loss: " << val_loss << std::endl;
         }
     }
     auto end_time = std::chrono::system_clock::now();

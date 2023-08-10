@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 list(APPEND CMAKE_PREFIX_PATH "/home/luber90/libtorch")
-project(cmag)
+project(cmag CXX CUDA)
 
 find_package(Torch REQUIRED)
 find_package(OpenCV REQUIRED)

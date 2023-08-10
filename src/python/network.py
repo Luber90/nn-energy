@@ -14,7 +14,7 @@ from unet import *
 from torchmetrics import StructuralSimilarityIndexMeasure, PeakSignalNoiseRatio
 import socket
 from datetime import datetime
-#import cv2
+import cv2
 
 
 def run(argv):
@@ -58,19 +58,21 @@ def run(argv):
         
         def __getitem__(self, idx):
             #to try
-            '''
+            
             img = cv2.imread(self.paths[idx])
             img =  cv2.resize(img, (SIZE, SIZE))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB).astype(np.float32)
             img = (img/128.)-1
-            '''
-            img = Image.open(self.paths[idx]).convert("RGB")
-            img = self.transforms(img)
-            img = np.array(img)
-            img_lab = rgb2lab(img).astype(np.float32)
-            img_lab = transforms.ToTensor()(img_lab)
-            L = img_lab[[0], ...] / 50. - 1. 
-            ab = img_lab[[1, 2], ...] / 128.
+            img = transforms.ToTensor()(img)
+            
+            # img = Image.open(self.paths[idx]).convert("RGB")
+            # img = self.transforms(img)
+            # img = np.array(img)
+            # img_lab = rgb2lab(img).astype(np.float32)
+            # print(img_lab.shape)
+            # img_lab = transforms.ToTensor()(img_lab)
+            L = img[[0], ...]# / 50. - 1. 
+            ab = img[[1, 2], ...]# / 128.
             return {'L': L, 'ab': ab}
         
         def __len__(self):
