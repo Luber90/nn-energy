@@ -9,7 +9,7 @@ import pynvml as nvml
 memory_gauge = Gauge('network_gpu_memory_usage_mb', 'GPU memory used by neural network in MiB')
 usage_gauge = Gauge('gpu_usage', 'GPU usage percentage')
 
-def run():
+def run(PID):
     nvml.nvmlInit()
     gpu_handle = nvml.nvmlDeviceGetHandleByIndex(0)
 
@@ -18,8 +18,6 @@ def run():
     start_http_server(8000)
 
     SLEEP_TIME = 10.0
-
-    PID = os.getpid()
 
     print(f'Measuring process {PID}')
 

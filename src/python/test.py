@@ -17,7 +17,7 @@ SIZE = 128
 
 img = transforms.Resize((SIZE, SIZE),  Image.BICUBIC)(img)
 
-img_lab = rgb2lab(img).astype("float32")
+img_lab = rgb2lab(img2).astype("float32")
 img_lab = transforms.ToTensor()(img_lab)
 L = img_lab[[0], ...] / 50. - 1.
 ab = img_lab[[1, 2], ...] / 128.
@@ -34,7 +34,7 @@ reconstructed = lab2rgb(true_pic)
 device = torch.device("cuda:0")
 
 model = UNet()
-model.load_state_dict(torch.load("model_output/model"))
+model.load_state_dict(torch.load("output/model"))
 model.to(device)
 L = L.to(device)
 model.eval()

@@ -7,30 +7,43 @@ from prometheus_api_client import PrometheusConnect, MetricsList, Metric
 from prometheus_api_client.utils import parse_datetime
 import datetime
 import os
+import subprocess
 
 
 if __name__ == '__main__':
     prom = PrometheusConnect(url="http://172.17.0.1:9090", disable_ssl=True)
-    measure_thread = threading.Thread(target=lambda: measure.run())
-    measure_thread.daemon = True
-    measure_thread.start()
-
     
     number_of_images = os.getenv("NUM")
     smaller = os.getenv("SMALL")
     epochs = os.getenv("EPOCH")
+    autocast = os.getenv("AUTO")
+    batch_size = os.getenv("BATCH")
+    adam = os.getenv("ADAM")
 
     try:
         number_of_images = int(number_of_images)
         smaller = smaller == "True"
         epochs = int(epochs)
-    except Exception as e:
-        #print(e)
-        number_of_images = 15_000
-        smaller = True
-        epochs = 1
+        autocast = autocast == "True"
+        batch_size = int(batch_size)
+        adam = adam == "True"
 
-    start_time, end_time, val_loss, val_ssim, val_psnr = network.run((number_of_images, smaller, epochs))
+    except Exception as e:
+        print('Using default parameters')
+        number_of_images = 30_000
+        smaller = False
+        epochs = 2
+        autocast = False
+        batch_size = 32
+        adam = False
+
+    #proc = subprocess.Popen(["./cmag"])
+    measure_thread = threading.Thread(target=lambda: measure.run(os.getpid()))
+    measure_thread.daemon = True
+    measure_thread.start()
+    #proc.wait()
+
+    start_time, end_time, val_loss, val_ssim, val_psnr = network.run((number_of_images, smaller, epochs, autocast, batch_size, adam))
 
     start_time = parse_datetime(start_time)
     end_time = parse_datetime(end_time)
@@ -67,7 +80,7 @@ if __name__ == '__main__':
     gpu_mem = sum(metric_data)/len(metric_data)
 
     with open("results.txt", "a") as file:
-        file.write(f"{start_time};{end_time};{number_of_images};{smaller};{epochs};{val_loss:.5f};{val_ssim:.5f};{val_psnr:.5f};{cpu_W:.2f};{gpu_W:.2f};{gpu_mem:.2f}\n")
+        file.write(f"{start_time};{end_time};{number_of_images};{smaller};{epochs};{autocast};{batch_size};{adam};{val_loss:.5f};{val_ssim:.5f};{val_psnr:.5f};{cpu_W:.2f};{gpu_W:.2f};{gpu_mem:.2f}\n")
     
     print(cpu_W, gpu_W, gpu_mem)
 

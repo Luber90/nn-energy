@@ -53,7 +53,8 @@
         "y": 1
       },
       "hiddenSeries": false,
-      "id": 18,
+      "id": 27,
+      "interval": "10s",
       "legend": {
         "avg": false,
         "current": false,
@@ -65,6 +66,7 @@
       },
       "lines": true,
       "linewidth": 1,
+      "maxDataPoints": 100000,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -84,7 +86,7 @@
             "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*networkc.*\"}/ 1000000) ",
           "interval": "",
           "legendFormat": "Network CPU Power",
           "range": true,
@@ -189,6 +191,7 @@
         "y": 1
       },
       "id": 24,
+      "interval": "10s",
       "options": {
         "legend": {
           "calcs": [],
@@ -303,6 +306,7 @@
           },
           "editorMode": "code",
           "expr": "network_gpu_memory_usage_mb",
+          "hide": false,
           "instant": false,
           "legendFormat": "Network GPU memory usage",
           "range": true,
@@ -418,7 +422,8 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*networkc.*\"}) / 1000000",
+          "hide": false,
           "instant": false,
           "range": true,
           "refId": "A"
@@ -444,11 +449,16 @@
             "alias": "Combined Power",
             "binary": {
               "left": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)",
+              "operator": "+",
               "reducer": "sum",
               "right": "gpu_usage{instance=\"docker.for.linux.localhost:8000\", job=\"net_measure_app\"}"
             },
-            "mode": "binary",
+            "mode": "reduceRow",
             "reduce": {
+              "include": [
+                "gpu_usage{instance=\"docker.for.linux.localhost:8000\", job=\"net_measure_app\"}",
+                "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train.py.*|.*cmag.*\"}) / 1000000"
+              ],
               "reducer": "sum"
             },
             "replaceFields": true
@@ -487,7 +497,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 8,
         "x": 0,
         "y": 17
@@ -516,7 +526,7 @@
             "uid": "PBE40D95A8B8C9AF4"
           },
           "editorMode": "code",
-          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*\"}/1000000)*0.00278",
+          "expr": "sum(scaph_process_power_consumption_microwatts{cmdline=~\".*train\\\\.py.*|.*networkc.*\"}/1000000)*0.00278",
           "instant": false,
           "legendFormat": "CPU Net Power used",
           "range": true,
@@ -541,6 +551,76 @@
       "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBE40D95A8B8C9AF4"
+      },
+      "description": "Average GPU memory usaed",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "string"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 17
+      },
+      "id": 28,
+      "interval": "10s",
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBE40D95A8B8C9AF4"
+          },
+          "editorMode": "code",
+          "expr": "network_gpu_memory_usage_mb",
+          "instant": false,
+          "legendFormat": "CPU Net Power used",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Average memory used by GPU",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
@@ -550,7 +630,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 25
       },
       "id": 19,
       "panels": [],
@@ -580,7 +660,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 25
+        "y": 26
       },
       "hiddenSeries": false,
       "id": 2,
@@ -669,7 +749,7 @@
         "h": 7,
         "w": 8,
         "x": 12,
-        "y": 25
+        "y": 26
       },
       "hiddenSeries": false,
       "id": 3,
@@ -757,7 +837,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 33
       },
       "id": 20,
       "panels": [],
@@ -787,7 +867,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 34
       },
       "hiddenSeries": false,
       "id": 4,
@@ -872,7 +952,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 41
       },
       "id": 21,
       "panels": [],
@@ -908,7 +988,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 41
+        "y": 42
       },
       "id": 5,
       "links": [],
@@ -956,7 +1036,7 @@
         "h": 7,
         "w": 16,
         "x": 8,
-        "y": 41
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 6,
@@ -1033,7 +1113,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -1073,8 +1153,8 @@
     ]
   },
   "time": {
-    "from": "2023-07-20T15:10:32.000Z",
-    "to": "2023-07-20T15:29:48.000Z"
+    "from": "now-30m",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [

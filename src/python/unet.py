@@ -44,8 +44,6 @@ class UNet(torch.nn.Module):
         self.d3 = conv_block(256, 128)
         self.ct4 = nn.ConvTranspose2d(128, 64, 2, 2)
         self.d4 = conv_block(128, 64)
-        #self.last1 = nn.ConvTranspose2d(64, 6, kernel_size=2, stride=2, padding=0)
-        #self.last2 = conv_block(64, 2)
         self.last1 = torch.nn.Conv2d(64, 2, kernel_size=3, padding=1)
         self.last2 = torch.nn.Tanh()
 
