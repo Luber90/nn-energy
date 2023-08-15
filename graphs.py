@@ -7,9 +7,8 @@ def draw_subplot(subid, title, xlabel, ylabel, results, y_min=None):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     if y_min is not None:
-        #print([v for v in results.values()])
         y_max = np.round(np.max(np.ravel([v for v in results.values()]))+200, decimals=-2)
-        plt.axis([0, len(results.keys())+1, y_min, y_max]) 
+        axis = plt.axis([0.5, len(results.keys())+0.5, y_min, y_max])
     violin = plt.violinplot([v for v in results.values()])
     for pc in violin['bodies']:
         pc.set_alpha(0.8)
@@ -19,7 +18,7 @@ def draw_subplot(subid, title, xlabel, ylabel, results, y_min=None):
     x_pos = np.arange(1, len(results.keys())+1)
     plt.xticks(x_pos, results.keys())
 
-def draw_graphs(stat_id, stat_name, file_name='results.txt'):
+def draw_graphs(stat_id, stat_name, file_name='results.txt', mini=4000):
     results_cpu = {}
     results_gpu = {}
     results_memory = {}
@@ -54,7 +53,7 @@ def draw_graphs(stat_id, stat_name, file_name='results.txt'):
 
     draw_subplot(231, 'CPU Wh', stat_name, 'Wh', results_cpu)
     draw_subplot(232, 'GPU Wh', stat_name, 'Wh', results_gpu)
-    draw_subplot(233, 'GPU Memory used', stat_name, 'MiB', results_memory, y_min=6000)
+    draw_subplot(233, 'GPU Memory used', stat_name, 'MiB', results_memory, y_min=mini)
     draw_subplot(234, 'Validation loss', stat_name, 'Loss', results_loss)
     draw_subplot(235, 'Validation SSim', stat_name, 'SSim', results_ssim)
     draw_subplot(236, 'Validation PSNR', stat_name, 'PSNR', results_psnr)
@@ -64,6 +63,10 @@ def draw_graphs(stat_id, stat_name, file_name='results.txt'):
 
 
 if __name__ == "__main__":
-    draw_graphs(2, 'Size of the set', 'results_size_old.txt')
-    draw_graphs(3, 'Size of the network', 'results_net_size_old.txt')
-    draw_graphs(5, 'Automatic mixed precision', 'results_auto_old.txt')
+    #draw_graphs(4, 'Number of epochs', 'results_epochs.txt', mini=6000)
+    #draw_graphs(2, 'Size of the set', 'results_size.txt')
+    draw_graphs(3, 'Size of the network', 'results_net_size.txt', mini=6000)
+    #draw_graphs(2, 'Size of the set', 'results_size_old.txt')
+    #draw_graphs(3, 'Size of the network', 'results_net_size_old.txt')
+    #draw_graphs(5, 'Automatic mixed precision', 'results_mixed.txt')
+    #draw_graphs(6, 'Batch size', 'results_batch.txt', mini=6000)

@@ -16,6 +16,72 @@ import socket
 from datetime import datetime
 import cv2
 
+def train_one_epoch(model, device, optim, dataloader_train, autocast, scaler, batches_threshold, epoch):
+    model.train()
+    running_loss = 0.0
+    for i, data in enumerate(dataloader_train, 0):
+        optim.zero_grad()
+
+        black_white = data['L']
+        black_white = black_white.to(device)
+        true_pic = data['ab']
+        true_pic = true_pic.to(device)
+
+        if autocast:
+            with torch.autocast('cuda'):
+                outputs = model(black_white)
+                loss = torch.nn.MSELoss()
+                loss_output = loss(outputs, true_pic)
+            scaler.scale(loss_output).backward()
+            scaler.step(optim)
+            scaler.update()
+
+        else:
+            outputs = model(black_white)
+            loss = torch.nn.MSELoss()
+            loss_output = loss(outputs, true_pic)
+        
+            loss_output.backward()
+            optim.step()
+        
+
+        running_loss += loss_output.item()
+
+        if i % batches_threshold == batches_threshold - 1:
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / batches_threshold :.3f}')
+            running_loss = 0.0
+            
+def check_validation(model, device, dataloader_val, autocast, scaler, ssim, psnr, epoch, num_of_images, num_train):
+    model.eval()
+    val_loss = 0.0
+
+    with torch.no_grad():
+        for j, data in enumerate(dataloader_val, 0):
+            black_white = data['L']
+            black_white = black_white.to(device)
+            true_pic = data['ab']
+            true_pic = true_pic.to(device)
+            
+            if autocast:
+                with torch.autocast('cuda'):
+                    outputs = model(black_white)
+                    loss = torch.nn.MSELoss()
+                    loss_output = loss(outputs, true_pic)
+            else:
+                outputs = model(black_white)
+                loss = torch.nn.MSELoss()
+                loss_output = loss(outputs, true_pic) 
+            
+            val_loss += loss_output.item()
+            ssim.update(outputs, true_pic)
+            psnr.update(outputs, true_pic)
+        val_loss = val_loss / ((num_of_images-num_train)/128)
+        val_ssim = ssim.compute()
+        val_psnr = psnr.compute()
+        print(f'[{epoch + 1}] validation loss: {val_loss:.5f} validation ssim: {val_ssim:.5f} validation psnr: {val_psnr:.5f}')
+    ssim.reset()
+    psnr.reset()
+    return val_loss, val_ssim, val_psnr
 
 def run(argv):
     num_of_images = argv[0]
@@ -28,7 +94,6 @@ def run(argv):
 
     paths = glob.glob("unlabeled2017/*.jpg")
 
-    #np.random.seed(42)
     paths_subset = np.random.choice(paths, num_of_images, replace=False)
 
     num_train = int(num_of_images*0.8)
@@ -44,35 +109,18 @@ def run(argv):
 
     class ColorizationDataset(Dataset):
         def __init__(self, paths, split='train'):
-            if split == 'train':
-                self.transforms = transforms.Compose([
-                    transforms.Resize((SIZE, SIZE),  Image.BICUBIC),
-                    transforms.RandomHorizontalFlip(),
-                ])
-            elif split == 'val':
-               self.transforms = transforms.Resize((SIZE, SIZE),  Image.BICUBIC)
-            
             self.split = split
             self.SIZE = SIZE
             self.paths = paths
         
         def __getitem__(self, idx):
-            #to try
-            
             img = cv2.imread(self.paths[idx])
             img =  cv2.resize(img, (SIZE, SIZE))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB).astype(np.float32)
             img = (img/128.)-1
             img = transforms.ToTensor()(img)
-            
-            # img = Image.open(self.paths[idx]).convert("RGB")
-            # img = self.transforms(img)
-            # img = np.array(img)
-            # img_lab = rgb2lab(img).astype(np.float32)
-            # print(img_lab.shape)
-            # img_lab = transforms.ToTensor()(img_lab)
-            L = img[[0], ...]# / 50. - 1. 
-            ab = img[[1, 2], ...]# / 128.
+            L = img[[0], ...]
+            ab = img[[1, 2], ...]
             return {'L': L, 'ab': ab}
         
         def __len__(self):
@@ -110,72 +158,12 @@ def run(argv):
 
     psnr = PeakSignalNoiseRatio().to(device)
 
-    if autocast: scaler = torch.cuda.amp.GradScaler()
+    scaler = torch.cuda.amp.GradScaler() if autocast else None
 
     for epoch in range(epochs):
+        train_one_epoch(model, device, optim, dataloader_train, autocast, scaler, batches_threshold, epoch)
 
-        running_loss = 0.0
-        for i, data in enumerate(dataloader_train, 0):
-            model.train()
-
-            optim.zero_grad()
-
-            black_white = data['L']
-            black_white = black_white.to(device)
-            true_pic = data['ab']
-            true_pic = true_pic.to(device)
-
-            if autocast:
-                with torch.autocast('cuda'):
-                    outputs = model(black_white)
-                    loss = torch.nn.MSELoss()
-                    loss_output = loss(outputs, true_pic)
-                scaler.scale(loss_output).backward()
-                scaler.step(optim)
-                scaler.update()
-
-            else:
-                outputs = model(black_white)
-                loss = torch.nn.MSELoss()
-                loss_output = loss(outputs, true_pic)
-            
-                loss_output.backward()
-                optim.step()
-            
-
-            running_loss += loss_output.item()
-
-            if i % batches_threshold  == batches_threshold - 1:
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / batches_threshold :.3f}')
-                running_loss = 0.0
-
-        model.eval()
-        val_loss = 0.0
-
-        with torch.no_grad():
-            for j, data in enumerate(dataloader_val, 0):
-                black_white = data['L']
-                black_white = black_white.to(device)
-                true_pic = data['ab']
-                true_pic = true_pic.to(device)
-                
-                if autocast:
-                    with torch.autocast('cuda'):
-                        outputs = model(black_white)
-                        loss = torch.nn.MSELoss()
-                        loss_output = loss(outputs, true_pic)
-                else:
-                    outputs = model(black_white)
-                    loss = torch.nn.MSELoss()
-                    loss_output = loss(outputs, true_pic) 
-                
-                val_loss += loss_output.item()
-                ssim.update(outputs, true_pic)
-                psnr.update(outputs, true_pic)
-            val_loss = val_loss / ((num_of_images-num_train)/128)
-            val_ssim = ssim.compute()
-            val_psnr = psnr.compute()
-            print(f'[{epoch + 1}] validation loss: {val_loss:.5f} validation ssim: {val_ssim:.5f} validation psnr: {val_psnr:.5f}')
+        val_loss, val_ssim, val_psnr = check_validation(model, device, dataloader_val, autocast, scaler, ssim, psnr, epoch, num_of_images, num_train)
 
     end_time = str(datetime.now())[:-7]
     print(start_time)

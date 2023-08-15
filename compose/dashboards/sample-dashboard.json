@@ -311,6 +311,31 @@
           "legendFormat": "Network GPU memory usage",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBE40D95A8B8C9AF4"
+          },
+          "editorMode": "code",
+          "expr": "process_resident_memory_bytes{job=\"net_measure_app\"}/(1024*1024)",
+          "hide": false,
+          "instant": false,
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBE40D95A8B8C9AF4"
+          },
+          "editorMode": "code",
+          "expr": "network_cpu_memory_usage_mb",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Network CPU memory usage",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Neural Net GPU Memory usage",
@@ -575,7 +600,7 @@
               }
             ]
           },
-          "unit": "string"
+          "unit": "mbytes"
         },
         "overrides": []
       },
@@ -611,12 +636,38 @@
           "editorMode": "code",
           "expr": "network_gpu_memory_usage_mb",
           "instant": false,
-          "legendFormat": "CPU Net Power used",
+          "legendFormat": "GPU memory",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBE40D95A8B8C9AF4"
+          },
+          "editorMode": "code",
+          "expr": "network_cpu_memory_usage_mb",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "CPU memory",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBE40D95A8B8C9AF4"
+          },
+          "editorMode": "code",
+          "expr": "process_resident_memory_bytes{job=\"net_measure_app\"}/(1024*1024)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "CPU memory",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "Average memory used by GPU",
+      "title": "Average memory used",
       "transformations": [],
       "type": "stat"
     },
@@ -1153,7 +1204,7 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
