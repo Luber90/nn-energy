@@ -1,6 +1,4 @@
-import os
 from time import sleep
-import socket
 from prometheus_client import Gauge, start_http_server
 import prometheus_client
 from pynvml.smi import nvidia_smi

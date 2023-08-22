@@ -1,6 +1,4 @@
-import os
 from time import sleep
-import socket
 from prometheus_client import Gauge, start_http_server
 import prometheus_client
 from pynvml.smi import nvidia_smi
@@ -23,7 +21,7 @@ def run(PID):
 
     print(f'Measuring process {PID}')
 
-    process = psutil.Process(PID)
+    measured_process = psutil.Process(PID)
     
     while True:
         gpu_memory_usage = 0.0
@@ -32,7 +30,7 @@ def run(PID):
                 gpu_memory_usage = process.usedGpuMemory/(1024*1024)
         memory_gauge.set(gpu_memory_usage)
 
-        memory_info = process.memory_full_info()
+        memory_info = measured_process.memory_full_info()
         ram_used = memory_info[0]/(1024**2)
         cpu_memory_gauge.set(ram_used)
         

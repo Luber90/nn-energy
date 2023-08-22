@@ -79,8 +79,18 @@ if __name__ == '__main__':
     metric_data = [float(v[1]) for v in metric_data[0]['values']]
     gpu_mem = sum(metric_data)/len(metric_data)
 
+    metric_data = prom.custom_query_range(
+        query='process_resident_memory_bytes{job="net_measure_app"}/(1024*1024)',
+        start_time=start_time,
+        end_time=end_time,
+        step=10.0
+    )
+
+    metric_data = [float(v[1]) for v in metric_data[0]['values']]
+    cpu_mem = sum(metric_data)/len(metric_data)
+
     with open("results.txt", "a") as file:
-        file.write(f"{start_time};{end_time};{number_of_images};{smaller};{epochs};{autocast};{batch_size};{adam};{val_loss:.5f};{val_ssim:.5f};{val_psnr:.5f};{cpu_W:.2f};{gpu_W:.2f};{gpu_mem:.2f}\n")
+        file.write(f"{start_time};{end_time};{number_of_images};{smaller};{epochs};{autocast};{batch_size};{adam};{val_loss:.5f};{val_ssim:.5f};{val_psnr:.5f};{cpu_W:.2f};{gpu_W:.2f};{gpu_mem:.2f};{cpu_mem:.2f}\n")
     
-    print(cpu_W, gpu_W, gpu_mem)
+    print(cpu_W, gpu_W, gpu_mem, cpu_mem)
 

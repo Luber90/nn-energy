@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 from unet import *
 
 
-img2 = Image.open('unlabeled2017/000000002437.jpg').convert("RGB")
-img = Image.open('unlabeled2017/000000002272.jpg').convert('RGB')
+img2 = Image.open('unlabeled2017/000000581877.jpg').convert("RGB")
+img = Image.open('unlabeled2017/000000581859.jpg').convert('RGB')
 plt.imshow(img)
 
 SIZE = 128
 
-img = transforms.Resize((SIZE, SIZE),  Image.BICUBIC)(img)
+img = transforms.Resize((SIZE, SIZE),  Image.BICUBIC)(img2)
 
 img_lab = rgb2lab(img).astype("float32")
 img_lab = transforms.ToTensor()(img_lab)
@@ -33,7 +33,7 @@ reconstructed = lab2rgb(true_pic)
 
 device = torch.device("cuda:0")
 
-model = UNet()
+model = UNet(smaller=True)
 model.load_state_dict(torch.load("output/model"))
 model.to(device)
 L = L.to(device)
