@@ -9,3 +9,4 @@ unlabeled2017
 *.cfg
 *.png
 src/cpp/build/
+.vscode/

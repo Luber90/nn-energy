@@ -134,8 +134,6 @@ if __name__ == "__main__":
     #draw_graphs(4, 'Number of epochs', 'results_epochs.txt', mini=6000)
     #draw_graphs(2, 'Size of the set', 'results_size.txt', mini=6000)
     #draw_graphs((4, 3), 'Size of the network', 'results_net_size.txt', mini=6000, alt_labels=('Bigger', 'Smaller'))
-    #draw_graphs(2, 'Size of the set', 'results_size_old.txt')
-    #draw_graphs(3, 'Size of the network', 'results_net_size_old.txt')
     #draw_graphs(5, 'Automatic mixed precision', 'results_mixed.txt', alt_labels=['Full precision', 'Mixed precision'])
     #draw_graphs(6, 'Batch size', 'results_batch.txt', mini=6000)
     draw_graphs_c(2, 'Programming language', 'results_c.txt', mini=6000, alt_labels=('Python', 'C++'))
